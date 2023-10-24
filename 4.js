@@ -48,4 +48,7 @@ function update_vis() {
     
 }
 
-d3.select("button").on("click", update_vis)
+// wait for dom loading
+document.addEventListener('DOMContentLoaded', function() {
+    d3.select("button").on("click", update_vis);
+})

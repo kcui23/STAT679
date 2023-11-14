@@ -21,13 +21,11 @@ function parse(data) {
     return Object.values(groupedData);
 }
 
-let lineElements;
-
 function draw_line(data, myscale) {
     line = d3.line()
         .x(d => myscale.x(d.date))
         .y(d => myscale.y(d.calfresh));
-    lineElements = d3.select("svg")
+    d3.select("svg")
         .select("#series")
         .selectAll("path")
         .data(data).enter()
@@ -38,24 +36,6 @@ function draw_line(data, myscale) {
             "stroke-opacity": 0.3,
             "d": line
         });
-}
-
-function highlightLine(county) {
-    lineElements.each(function(d) {
-        if (d[0].county === county) {
-            d3.select(this)
-              .attrs({
-                    "stroke-opacity": 1,
-                    "stroke-width": "3px",
-                    "stroke": "darkblue"
-                });
-        }
-    });
-}
-
-function resetHighlight() {
-    lineElements.attr("stroke-opacity", 0.3)
-                .attr("stroke", "black");
 }
 
 function add_axes(myscale) {
@@ -113,13 +93,6 @@ function visualize_choropleth(data) {
             "stroke-width": 0.1,
             "stroke": "black"
         })
-        .on("mouseover", function(event, d) {
-            let county = d.properties.COUNTY_NAME;
-            highlightLine(county);
-        })
-        .on("mouseout", function(event, d) {
-            resetHighlight();
-        });
 }
 
 function c_parse(data) {

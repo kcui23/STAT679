@@ -21,22 +21,30 @@ function parse(data) {
     return Object.values(groupedData);
 }
 
-function draw_line(data, myscale) {
-    line = d3.line()
+function draw_line(county, data, myscale) {
+    let line = d3.line()
         .x(d => myscale.x(d.date))
         .y(d => myscale.y(d.calfresh));
-    d3.select("svg")
-        .select("#series")
-        .selectAll("path")
-        .data(data).enter()
-        .append("path")
-        .attrs({
-            "fill": "none",
-            "stroke": "black",
-            "stroke-opacity": 0.3,
-            "d": line
-        });
+
+    let paths = d3.select("svg")
+                  .select("#series")
+                  .selectAll("path")
+                  .data(data, d => d.county);
+
+    paths.enter()
+         .append("path")
+         .attr("id", county)
+         .attr("stroke", "darkblue")
+         .attr("stroke-width", 2)
+         .attr("fill", "none");
+
+    paths.transition()
+         .duration(500)
+         .attr("d", line);
+
+    paths.exit().remove();
 }
+
 
 function add_axes(myscale) {
     let x_axis = d3.axisBottom()
@@ -62,7 +70,8 @@ function add_axes(myscale) {
 }
 
 function myscale(data) {
-    let y_max = d3.max(data, d => d3.max(d, d => d.calfresh)),
+    let flattenedData = data.flat();
+    let y_max = d3.max(flattenedData, d => +d.calfresh),
         x_extent = d3.extent(data[0].map(d => d.date));
 
     return {
@@ -76,16 +85,12 @@ function myscale(data) {
 }
 
 function updateLineChart(selectedCounty) {
-    console.log(originalData);
-    console.log(selectedCounty);
     let filteredData = originalData.filter(d=> d[0].county === selectedCounty);
-    console.log(filteredData);
-    draw_line(filteredData, myscale(filteredData));
     updateYAxis(myscale(filteredData));
+    draw_line(selectedCounty, filteredData, myscale(filteredData));
 }
 
 function updateYAxis(myscale) {
-    // remove old y axis with transition
     if (d3.select("#y_axis")) {
         d3.selectAll("#y_axis").remove();
     }
@@ -106,7 +111,6 @@ function updateYAxis(myscale) {
 function visualize_choropleth(data) {
     originalData = parse(data[1]);
     data = c_parse(data);
-    console.log(data);
     let proj = d3.geoMercator()
         .fitSize([600, 600], data)
     let path = d3.geoPath()

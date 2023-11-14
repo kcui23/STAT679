@@ -21,10 +21,27 @@ function parse(data) {
     return Object.values(groupedData);
 }
 
+let count = 0;
 function draw_line(county, data, myscale) {
     let line = d3.line()
         .x(d => myscale.x(d.date))
         .y(d => myscale.y(d.calfresh));
+    
+    if (count == 0) {
+        d3.select("svg")
+            .select("#series")
+            .selectAll("path")
+            .data(data, d => d.county).enter()
+            .append("path")
+            .attrs({
+                "id": county,
+                "fill": "none",
+                "stroke": "darkblue",
+                "stroke-width": 2,
+                "d": line
+            });
+    }
+    count++;
 
     let paths = d3.select("svg")
                   .select("#series")
@@ -103,6 +120,11 @@ function updateYAxis(myscale) {
         .attr("transform", `translate(${margins.left}, 0)`);
 }
 
+function updateBoerder(d) {
+    d3.select("#map")
+        .selectAll("path")
+        .attr("stroke-width", e => e.properties.COUNTY_NAME == d.properties.COUNTY_NAME ? 2 : 0.1);
+}
 
 function visualize_choropleth(data) {
     originalData = parse(data[1]);
@@ -125,6 +147,7 @@ function visualize_choropleth(data) {
         .on("mouseover", function(event, d) {
             let selectedCounty = d.properties.COUNTY_NAME;
             updateLineChart(selectedCounty);
+            updateBoerder(d);
         })
 }
 

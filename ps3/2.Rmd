@@ -1,0 +1,54 @@
+```{r}
+library(tidyverse)
+```
+
+```{r}
+pbs_full <- read_csv("https://uwmadison.box.com/shared/static/fcy9q1uleqru7gcs287q903y0rcnw2a2.csv") %>% 
+  mutate(Month = as.Date(Month))
+
+top_atcs <- pbs_full %>% 
+  group_by(ATC2_desc) %>% 
+  summarise(total = sum(Scripts)) %>% 
+  slice_max(total, n = 10) %>% 
+  pull(ATC2_desc)
+
+pbs <- pbs_full %>%
+  filter(ATC2_desc %in% top_atcs, Month > "2007-01-01")
+```
+
+```{r}
+library(scales)
+
+ggplot(pbs) + 
+  geom_area(aes(Month, Scripts, fill=ATC2_desc)) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  scale_y_continuous(expand = c(0, 0, 0.2, 0), labels = label_number(scale_cut = cut_long_scale())) +
+  theme(legend.position = "right",
+        legend.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 55, vjust = 0.6)) +
+  scale_fill_brewer(palette = "Paired")
+```
+
+```{r}
+library(scales)
+library(ggalluvial)
+
+ggplot(pbs) + 
+  geom_alluvium(aes(Month, Scripts, alluvium = ATC2_desc, fill=ATC2_desc), decreasing = FALSE, alpha = 0.9) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  scale_y_continuous(expand = c(0, 0, 0.2, 0), labels = label_number(scale_cut = cut_long_scale())) +
+  theme(legend.position = "right",
+        legend.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 55, vjust = 0.6)) +
+  scale_fill_brewer(palette = "Paired")
+```
+
+Stacked area:
+Weakness: The order of data for different groups does not change over time, which means it is difficult to compare which prescription drugs were used the most during the same period (especially after the quantity has changed).
+Strength: We can clearly observe the changing trends in the overall usage of these prescription drugs.
+Queries easier to answer: In which month PSYCHOLEPTICS and SERUMLIPIDREDUCING AGENTS (the two medicines at the bottom in the picture) combined have the most use?
+
+Alluvial visualization:
+Weakness: Because we don't have a single dimension to faceting with, putting all ten variables in one graph looks messy. When multiple variables change ordering in a month, the plot on this month does not provide much information.
+Strength: The variables are arranged in an orderly manner, and we can always know which drug is used the most in a given month.
+Queries easier to answer: How a drug's ranking among all these prescription drugs changes over time?

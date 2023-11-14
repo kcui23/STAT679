@@ -1,0 +1,84 @@
+```{r}
+library(scales)
+library(tidyverse)
+
+spotify_full <- read_csv("https://uwmadison.box.com/shared/static/xj4vupjbicw6c8tbhuynw0pll6yh1w0d.csv")
+top_songs <- spotify_full %>%
+  group_by(track_name) %>% 
+  summarise(total = sum(streams)) %>% 
+  slice_max(total, n = 40) %>% 
+  pull(track_name)
+spotify <- spotify_full %>%
+  filter(region == "global", track_name %in% top_songs)
+```
+
+```{r, fig.width=6, fig.height=12}
+ggplot(spotify) +
+  geom_line(aes(date, streams), lwd = 0.3 ,alpha = 0.7) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  scale_y_continuous(breaks = seq(0, max(spotify$streams), by = 5000000), 
+                     expand = c(0, 0, 0.2, 0), 
+                     labels = label_number(scale_cut = cut_long_scale())) +
+  facet_grid(artist~., labeller = label_wrap_gen(width = 10)) +
+  theme(strip.text.y = element_text(angle = 0, size = 8, hjust = 0))
+```
+```{r, fig.width=12 ,fig.height=6}
+ggplot(spotify) +
+  geom_line(aes(date, streams), lwd = 0.3 ,alpha = 0.7) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  scale_y_continuous(breaks = seq(0, max(spotify$streams), by = 2000000), 
+                     expand = c(0, 0, 0.2, 0), 
+                     labels = label_number(scale_cut = cut_long_scale())) +
+  theme(strip.text.y = element_text(angle = 0, size = 8, hjust = 0),
+        legend.position = "none")
+```
+
+
+```{r, fig.width=6, fig.height=12}
+library(ggHoriPlot)
+
+convert_label <- function(input_string) {
+  output_string <- gsub("e\\+07", "0M", input_string)
+  output_string <- gsub("e\\+06", "M", output_string)
+  output_string <- gsub("\\.10M", "1M", output_string)
+  return(output_string)
+}
+
+cutpoints <- seq(0, max(spotify$streams), by = 1000000)
+ggplot(spotify) +
+  geom_horizon(aes(date, streams, fill = ..Cutpoints..), origin = 0, horizonscale = cutpoints) +
+  scale_fill_hcl(palette = 'RdBu', labels = convert_label) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 6),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        strip.text.y = element_text(angle = 0, size = 8, hjust = 0)) +
+  facet_grid(artist~., labeller = label_wrap_gen(width = 10))
+```
+```{r, fig.width=12 ,fig.height=6}
+library(ggHoriPlot)
+
+cutpoints <- seq(0, max(spotify$streams), by = 1000000)
+ggplot(spotify) +
+  geom_horizon(aes(date, streams, fill = ..Cutpoints..), origin = 0, horizonscale = cutpoints) +
+  scale_fill_hcl(palette = 'RdBu', labels = convert_label) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  theme(legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.box = "horizontal",
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        strip.text.y = element_text(angle = 0, size = 8, hjust = 0))
+```
+
+Part (a) interactivity:
+The structure of interaction: I will use d3.line to draw all these time series simultaneously, and then update a part of them when the mouse moves.
+How would the display update: When the mouse moves, the time series line closest to the mouse will be highlighted, for example by changing its attributes in the 'attrs', such as the stroke (turning red) and stroke-width (becoming thicker).
+One type of D3 selection or mouse event I would like to use: <code>d3.select("svg").on("mousemove",...)</code> and <code>d3.selectAll(#lines).selectAll(path)...</code>. This will detect the movement of the mouse and then trigger an update event.
+
+Part (b) interactivity:
+The structure of interaction: I will use d3.area to define the shape of the data. I will add a slider to adjust the 'band', which refers to the 'origin' parameter in the geom_horizon() plot. This will change the coloring range and display range of the horizon plot.
+How would the display update: When the user slides the slider, the display of the horizon plot updates accordingly. A smaller 'band' will reduce the number of shadings and show a more global view, while a larger 'band' will increase the number of shadings and reveal more detailed variations.
+One type of D3 selection or mouse event I would like to use: <code>d3.selectAll(#horizons).selectAll(path)...</code> will be called when the slider updated. <code>d3.select("#mySlider").on("input", function() {
+  var sliderValue = d3.select(this).property("value");...}</code> can be used to recognize slider changes.

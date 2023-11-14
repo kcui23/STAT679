@@ -1,0 +1,47 @@
+```{r}
+library(sf)
+library(tmap)
+library(ceramic)
+library(tidyverse)
+lake <- read_sf("https://raw.githubusercontent.com/kcui23/stat679/main/ps3/GL_3basins_2015.geojson")
+```
+
+```{r}
+cat("Number of lakes:", dim(lake)[1], "\n")
+largest_lakes <- lake %>% 
+  group_by(Sub_Basin) %>% 
+  arrange(desc(Area)) %>% 
+  slice(1) %>% 
+  select(Sub_Basin, Latitude, Longitude)
+cat("The latitude / longitude of the largest lakes in each Sub-basin:\n")
+for (i in 1:dim(largest_lakes)[1]){
+  cat(largest_lakes[i,]$Sub_Basin, ": ", largest_lakes[i,]$Latitude, ", ", largest_lakes[i,]$Longitude, "\n", sep="")
+}
+```
+```{r}
+tm_map <- tm_shape(largest_lakes) +
+  tm_polygons() +
+  tm_facets(by = "Sub_Basin") +
+  tm_scale_bar()
+tmap_save(tm_map, filename = "1b.png", width = 3000, height = 2000, dpi = 500) 
+```
+
+```{r}
+selected_lakes <- lake %>% 
+  filter(Latitude >= 28.2, Latitude <= 28.4, Longitude >= 85.8, Longitude <= 86)
+
+Sys.setenv(MAPBOX_API_KEY="pk.eyJ1Ijoia3Jpc3JzMTEyOCIsImEiOiJjbDYzdjJzczQya3JzM2Jtb2E0NWU1a3B3In0.Mk4-pmKi_klg3EKfTw-JbQ")
+center_latitude <- mean(selected_lakes$Latitude)
+center_longitude <- mean(selected_lakes$Longitude)
+basemap <- cc_location(loc = c(center_longitude, center_latitude), buffer = 13e3)
+
+tm_map <- tm_shape(basemap) +
+  tm_rgb() +
+  tm_shape(selected_lakes) +
+  # tm_polygons() +
+  tm_borders(col = "blue", lwd = 2) +
+  tm_fill(col = "cyan", alpha = 0.3) +
+  tm_scale_bar(text.size = 0.7, bg.color = "white", text.color = "black")
+tmap_save(tm_map, filename = "1c.png", width = 3000, height = 2000, dpi = 400) 
+```
+

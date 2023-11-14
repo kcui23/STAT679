@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Problem Set 3 - Kai Cui</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css">
+    <style>
+        .table-custom {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .table-custom th {
+            text-align: left;
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <br>
+        <h1>Problem Set 3</h1>
+        <h3><a href="mailto:kcui23@wisc.edu">Kai Cui</a></h3><br>
+
+        <h2>Problem 1</h2>
+        <h4>a.</h4>
+        <p>There are 3624 lakes in this dataset. The latitude /longitude of the largest lakes in each Sub-basin:</p>
+        <table class="table table-hover table-custom">
+            <thead>
+                <tr>
+                    <th>Sub-basin</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Arun</td>
+                    <td>28.37403</td>
+                    <td>86.30475</td>
+                </tr>
+                <tr>
+                    <td>Bheri</td>
+                    <td>29.19634</td>
+                    <td>82.94822</td>
+                </tr>
+                <tr>
+                    <td>Budhi Gandaki</td>
+                    <td>28.59618</td>
+                    <td>84.62826</td>
+                </tr>
+                <tr>
+                    <td>Dudh Koshi</td>
+                    <td>27.89853</td>
+                    <td>86.9251</td>
+                </tr>
+                <tr>
+                    <td>Humla</td>
+                    <td>30.12892</td>
+                    <td>81.78076</td>
+                </tr>
+                <tr>
+                    <td>Indrawati</td>
+                    <td>28.04209</td>
+                    <td>85.71757</td>
+                </tr>
+                <tr>
+                    <td>Kali</td>
+                    <td>30.56462</td>
+                    <td>80.17877</td>
+                </tr>
+                <tr>
+                    <td>Kali Gandaki</td>
+                    <td>29.2185</td>
+                    <td>83.70156</td>
+                </tr>
+                <tr>
+                    <td>Karnali</td>
+                    <td>29.64815</td>
+                    <td>81.55488</td>
+                </tr>
+                <tr>
+                    <td>Kawari</td>
+                    <td>29.89755</td>
+                    <td>81.57738</td>
+                </tr>
+                <tr>
+                    <td>Likhu</td>
+                    <td>27.71321</td>
+                    <td>86.54286</td>
+                </tr>
+                <tr>
+                    <td>Marsyangdi</td>
+                    <td>28.69089</td>
+                    <td>83.85184</td>
+                </tr>
+                <tr>
+                    <td>Mugu</td>
+                    <td>29.75376</td>
+                    <td>82.41434</td>
+                </tr>
+                <tr>
+                    <td>Seti</td>
+                    <td>28.44681</td>
+                    <td>84.11694</td>
+                </tr>
+                <tr>
+                    <td>Sun Koshi</td>
+                    <td>28.32223</td>
+                    <td>85.83813</td>
+                </tr>
+                <tr>
+                    <td>Tama Koshi</td>
+                    <td>27.94679</td>
+                    <td>86.44713</td>
+                </tr>
+                <tr>
+                    <td>Tamor</td>
+                    <td>27.86953</td>
+                    <td>87.86618</td>
+                </tr>
+                <tr>
+                    <td>Tila</td>
+                    <td>29.38408</td>
+                    <td>82.42375</td>
+                </tr>
+                <tr>
+                    <td>Trishuli</td>
+                    <td>28.46783</td>
+                    <td>85.51938</td>
+                </tr>
+                <tr>
+                    <td>West Seti</td>
+                    <td>29.77282</td>
+                    <td>81.52618</td>
+                </tr>
+            </tbody>
+        </table>
+        <h4>b.</h4>
+        <img src="1b.png" alt="1b" width="85%">
+        <h4>c.</h4>
+        <img src="1c.png" alt="1c" width="85%">
+
+        <h2>Problem 2</h2>
+        <h4>a.</h4>
+        <img src="2a.png" alt="2a" width="85%">
+        <h4>b.</h4>
+        <img src="2b.png" alt="2b" width="85%">
+        <h4>c.</h4>
+        <h5>Stacked Area</h5>
+        <ul>
+            <li><strong>Weakness:</strong> The order of data for different groups does not change over time, which means
+                it is difficult to compare which prescription drugs were used the most during the same period
+                (especially after the quantity has changed).</li>
+            <li><strong>Strength:</strong> We can clearly observe the changing trends in the overall usage of these
+                prescription drugs.</li>
+            <li><strong>Queries easier to answer:</strong> In which month PSYCHOLEPTICS and SERUMLIPIDREDUCING AGENTS
+                (the two medicines at the bottom in the picture) combined have the most use?</li>
+        </ul>
+        <h5>Alluvial Visualization</h5>
+        <ul>
+            <li><strong>Weakness:</strong> Because we don't have a single dimension to faceting with, putting all ten
+                variables in one graph looks messy. When multiple variables change ordering in a month, the plot on this
+                month does not provide much information.</li>
+            <li><strong>Strength:</strong> The variables are arranged in an orderly manner, and we can always know which
+                drug is used the most in a given month.</li>
+            <li><strong>Queries easier to answer:</strong> How a drug's ranking among all these prescription drugs
+                changes over time?</li>
+        </ul>
+
+        <h2>Problem 3</h2>
+        <h4>a & b.</h4>
+        <img src="3a.png" alt="3a" width="45%">
+        <img src="3b.png" alt="3a" width="45%">
+        <img src="3a1.png" alt="3a1" width="85%">
+        <h4>c.</h4>
+        <h5>Part (a) interactivity:</h5>
+        <ul>
+            <li><strong>The structure of interaction:</strong> I will use <code>d3.line</code> to draw all these time
+                series simultaneously, and then update a part of them when the mouse moves.</li>
+            <li><strong>How would the display update:</strong> When the mouse moves, the time series line closest to the
+                mouse will be highlighted, for example by changing its attributes in the 'attrs', such as the stroke
+                (turning red) and stroke-width (becoming thicker).</li>
+            <li><strong>One type of D3 selection or mouse event I would like to use:</strong>
+                <code>d3.select("svg").on("mousemove",...)</code> and
+                <code>d3.selectAll("#lines").selectAll("path")...</code>. This will detect the movement of the mouse and
+                then trigger an update event.</li>
+        </ul>
+
+        <h5>Part (b) interactivity:</h5>
+        <ul>
+            <li><strong>The structure of interaction:</strong> I will use <code>d3.area</code> to define the shape of
+                the data. I will add a slider to adjust the 'band', which refers to the 'origin' parameter in the
+                <code>geom_horizon()</code> plot. This will change the coloring range and display range of the horizon
+                plot.</li>
+            <li><strong>How would the display update:</strong> When the user slides the slider, the display of the
+                horizon plot updates accordingly. A smaller 'band' will reduce the number of shadings and show a more
+                global view, while a larger 'band' will increase the number of shadings and reveal more detailed
+                variations.</li>
+            <li><strong>One type of D3 selection or mouse event I would like to use:</strong>
+                <code>d3.selectAll("#horizons").selectAll("path")...</code> will be called when the slider updated.
+                <code>d3.select("#mySlider").on("input", function() { var sliderValue = d3.select(this).property("value");...}</code>
+                can be used to recognize slider changes.</li>
+        </ul>
+
+
+        <h2>Problem 4</h2>
+        <h4>a.</h4>
+        <iframe src="https://kcui23.github.io/stat679/ps3/4.html" width="900" height="1500"></iframe>
+        <h4>c.</h4>
+        <p>One possible interactivity is highlighting the time series when the a county is hovered.</p>
+        <h4>d.</h4>
+
+        <h2>Problem 5</h2>
+        <h4>a. <code>geom_stream</code></h4>
+        <ul>
+            <li><b>Role</b>: To visualize how the total number and composition of character appearances change over
+                issues. </li>
+            <li><b>Hypothetical use</b>: Imagine you want to describe the demographic trends of different occupations in
+                a certain area.</li>
+        </ul>
+        <h4>b. <code>tm_lines</code></h4>
+        <ul>
+            <li><b>Role</b>: It is used to draw lines on a map. It is very useful for objects like rivers.</li>
+            <li><b>Hypothetical use</b>: Imagine you want to describe the distribution and flow direction of rivers in a
+                certain area.</li>
+        </ul>
+        <h4>c. <code>rast</code></h4>
+        <ul>
+            <li><b>Role</b>: It is used to process raster dataIt is used to process raster data. Raster data gives
+                measurements along a spatial grid and may contain multiple channels. This allows this kind of data to
+                efficiently represent information such as land cover. </li>
+            <li><b>Hypothetical use</b>: For example, we want to know the geographical distribution of a certain plant
+                in an area.</li>
+        </ul>
+        <h4>d. <code>geom_horizon</code></h4>
+        <ul>
+            <li><b>Role</b>: This function is used to create horizon plots, a type of visualization that is effective
+                for displaying time series data where space is limited. It layers and colors different segments of the
+                data, allowing multiple time series to be compared in a compact format.</li>
+            <li><b>Hypothetical use</b>: For example, we want to compare the temperature changes in several regions
+                within a year.</li>
+        </ul>
+
+        <h2>Problem 6</h2>
+        <h4>a.</h4>
+        <ul>
+            <li><b>Description of a spacial dataset</b>: The locations of various products within a supermarket.</li>
+            <li><b>Visual encodings</b>: <ul>
+                    <li>Graphic Representation: Different shapes represent different types of products.</li>
+                    <li>Color Coding: Different colors for different product categories.</li>
+                    <li>Signage System: Specific locations of items marked on the map.</li>
+                </ul>
+            </li>
+            <li><b>interactivity</b>: None.</li>
+        </ul>
+        <h4>b.</h4>
+        <p><b>Questions answered by the visualization</b>: How to find a specific product, like bread, in the
+            supermarket.</p>
+        <p><b>Accuracy and ease of finding answers</b>: With the current design, it can be quite challenging due to the
+            extensive variety of products and dense information on the map, especially for new customers.</p>
+        <h4>c. Alternative visualization</h4>
+        <ul>
+            <li><b>Concept</b>: <ul>
+                    <li>Use different colors to indicate major product categories (e.g., green for fresh produce, blue
+                        for frozen foods).</li>
+                    <li>The map highlights the locations of items on the customer's shopping list.</li>
+                </ul>
+            </li>
+            <li><b>Reason for this idea</b>: A dynamic, interactive map can significantly reduce the time taken to find
+                products, especially helpful for those unfamiliar with the store layout. Customers can add items to a
+                shopping list in advance, knowing approximately how long they will spend in the supermarket, aiding in
+                planning subsequent activities.</li>
+            <li><b>Advantages</b>: Speeds up the process of finding desired products.</li>
+        </ul>
+        <br>
+        <br>
+        <br>
+        <br>
+
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-r.min.js"></script>
+    <!-- 对于R语言高亮 -->
+</body>
+
+</html>

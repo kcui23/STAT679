@@ -33,6 +33,25 @@
 
         <h2>Problem 1</h2>
         <h4>a.</h4>
+        <div><a href="#collapseCode1a" class="btn btn-primary" data-toggle="collapse">Show/Hide code</a></div>
+        <div id="collapseCode1a" class="collapse">
+            <pre><code class="language-r">library(sf)
+library(tmap)
+library(ceramic)
+library(tidyverse)
+lake <- read_sf("https://raw.githubusercontent.com/kcui23/stat679/main/ps3/GL_3basins_2015.geojson")
+
+cat("Number of lakes:", dim(lake)[1], "\n")
+largest_lakes <- lake %>% 
+  group_by(Sub_Basin) %>% 
+  arrange(desc(Area)) %>% 
+  slice(1) %>% 
+  select(Sub_Basin, Latitude, Longitude)
+cat("The latitude / longitude of the largest lakes in each Sub-basin:\n")
+for (i in 1:dim(largest_lakes)[1]){
+  cat(largest_lakes[i,]$Sub_Basin, ": ", largest_lakes[i,]$Latitude, ", ", largest_lakes[i,]$Longitude, "\n", sep="")
+}</code></pre>
+        </div>
         <p>There are 3624 lakes in this dataset. The latitude /longitude of the largest lakes in each Sub-basin:</p>
         <table class="table table-hover table-custom">
             <thead>
@@ -146,14 +165,68 @@
             </tbody>
         </table>
         <h4>b.</h4>
+        <div><a href="#collapseCode1b" class="btn btn-primary" data-toggle="collapse">Show/Hide code</a></div>
+        <div id="collapseCode1b" class="collapse">
+            <pre><code class="language-r">tm_map &lt;- tm_shape(largest_lakes) +
+  tm_polygons() +
+  tm_facets(by = "Sub_Basin") +
+  tm_scale_bar()
+tmap_save(tm_map, filename = "1b.png", width = 3000, height = 2000, dpi = 500)</code></pre>
+        </div>
         <img src="1b.png" alt="1b" width="85%">
         <h4>c.</h4>
+        <div><a href="#collapseCode1c" class="btn btn-primary" data-toggle="collapse">Show/Hide code</a></div>
+        <div id="collapseCode1c" class="collapse">
+            <pre><code class="language-r">selected_lakes <- lake %>% 
+  filter(Latitude >= 28.2, Latitude <= 28.4, Longitude >= 85.8, Longitude <= 86)
+
+Sys.setenv(MAPBOX_API_KEY="pk.eyJ1Ijoia3Jpc3JzMTEyOCIsImEiOiJjbDYzdjJzczQya3JzM2Jtb2E0NWU1a3B3In0.Mk4-pmKi_klg3EKfTw-JbQ")
+center_latitude <- mean(selected_lakes$Latitude)
+center_longitude <- mean(selected_lakes$Longitude)
+basemap <- cc_location(loc = c(center_longitude, center_latitude), buffer = 13e3)
+
+tm_map <- tm_shape(basemap) +
+  tm_rgb() +
+  tm_shape(selected_lakes) +
+  # tm_polygons() +
+  tm_borders(col = "blue", lwd = 2) +
+  tm_fill(col = "cyan", alpha = 0.3) +
+  tm_scale_bar(text.size = 0.7, bg.color = "white", text.color = "black")
+tmap_save(tm_map, filename = "1c.png", width = 3000, height = 2000, dpi = 400) </code></pre>
+        </div>
         <img src="1c.png" alt="1c" width="85%">
 
         <h2>Problem 2</h2>
         <h4>a.</h4>
+        <div><a href="#collapseCode2a" class="btn btn-primary" data-toggle="collapse">Show/Hide code</a></div>
+        <div id="collapseCode2a" class="collapse">
+            <pre><code class="language-r">library(scales)
+
+ggplot(pbs) + 
+  geom_area(aes(Month, Scripts, fill=ATC2_desc)) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  scale_y_continuous(expand = c(0, 0, 0.2, 0), labels = label_number(scale_cut = cut_long_scale())) +
+  theme(legend.position = "right",
+        legend.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 55, vjust = 0.6)) +
+  scale_fill_brewer(palette = "Paired")</code></pre>
+        </div>
         <img src="2a.png" alt="2a" width="85%">
         <h4>b.</h4>
+        <div><a href="#collapseCode2b" class="btn btn-primary" data-toggle="collapse">Show/Hide code</a></div>
+        <div id="collapseCode2b" class="collapse">
+            <pre><code class="language-r">library(scales)
+library(ggalluvial)
+
+ggplot(pbs) + 
+  geom_alluvium(aes(Month, Scripts, alluvium = ATC2_desc, fill=ATC2_desc), decreasing = FALSE, alpha = 0.9) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  scale_y_continuous(expand = c(0, 0, 0.2, 0), labels = label_number(scale_cut = cut_long_scale())) +
+  theme(legend.position = "right",
+        legend.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 55, vjust = 0.6)) +
+  scale_fill_brewer(palette = "Paired")</code></pre>
+        </div>
         <img src="2b.png" alt="2b" width="85%">
         <h4>c.</h4>
         <h5>Stacked Area</h5>
@@ -179,6 +252,51 @@
 
         <h2>Problem 3</h2>
         <h4>a & b.</h4>
+        <div><a href="#collapseCode3ab" class="btn btn-primary" data-toggle="collapse">Show/Hide code for part (a)</a></div>
+        <div id="collapseCode3ab" class="collapse">
+            <pre><code class="language-r">ggplot(spotify) +
+  geom_line(aes(date, streams), lwd = 0.3 ,alpha = 0.7) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  scale_y_continuous(breaks = seq(0, max(spotify$streams), by = 5000000), 
+                     expand = c(0, 0, 0.2, 0), 
+                     labels = label_number(scale_cut = cut_long_scale())) +
+  facet_grid(artist~., labeller = label_wrap_gen(width = 10)) +
+  theme(strip.text.y = element_text(angle = 0, size = 8, hjust = 0))
+
+ggplot(spotify) +
+  geom_line(aes(date, streams), lwd = 0.3 ,alpha = 0.7) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  scale_y_continuous(breaks = seq(0, max(spotify$streams), by = 2000000), 
+                     expand = c(0, 0, 0.2, 0), 
+                     labels = label_number(scale_cut = cut_long_scale())) +
+  theme(strip.text.y = element_text(angle = 0, size = 8, hjust = 0),
+        legend.position = "none")</code></pre>
+        </div>
+        <br>
+        <div><a href="#collapseCode3b" class="btn btn-primary" data-toggle="collapse">Show/Hide code for part (b)</a></div>
+        <div id="collapseCode3b" class="collapse">
+            <pre><code class="language-r">library(ggHoriPlot)
+
+convert_label <- function(input_string) {
+    output_string <- gsub("e\\+07", "0M", input_string)
+    output_string <- gsub("e\\+06", "M", output_string)
+    output_string <- gsub("\\.10M", "1M", output_string)
+    return(output_string)
+}
+
+cutpoints <- seq(0, max(spotify$streams), by = 1000000)
+ggplot(spotify) +
+  geom_horizon(aes(date, streams, fill = ..Cutpoints..), origin = 0, horizonscale = cutpoints) +
+  scale_fill_hcl(palette = 'RdBu', labels = convert_label) +
+  scale_x_date(expand = c(0, 0), date_labels = "%b %Y", date_breaks = "2 month") +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 6),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        strip.text.y = element_text(angle = 0, size = 8, hjust = 0)) +
+  facet_grid(artist~., labeller = label_wrap_gen(width = 10))</code></pre>
+        </div>
+        <br>
         <img src="3a.png" alt="3a" width="45%">
         <img src="3b.png" alt="3a" width="45%">
         <img src="3a1.png" alt="3a1" width="85%">
@@ -193,7 +311,8 @@
             <li><strong>One type of D3 selection or mouse event I would like to use:</strong>
                 <code>d3.select("svg").on("mousemove",...)</code> and
                 <code>d3.selectAll("#lines").selectAll("path")...</code>. This will detect the movement of the mouse and
-                then trigger an update event.</li>
+                then trigger an update event.
+            </li>
         </ul>
 
         <h5>Part (b) interactivity:</h5>
@@ -201,7 +320,8 @@
             <li><strong>The structure of interaction:</strong> I will use <code>d3.area</code> to define the shape of
                 the data. I will add a slider to adjust the 'band', which refers to the 'origin' parameter in the
                 <code>geom_horizon()</code> plot. This will change the coloring range and display range of the horizon
-                plot.</li>
+                plot.
+            </li>
             <li><strong>How would the display update:</strong> When the user slides the slider, the display of the
                 horizon plot updates accordingly. A smaller 'band' will reduce the number of shadings and show a more
                 global view, while a larger 'band' will increase the number of shadings and reveal more detailed
@@ -209,13 +329,169 @@
             <li><strong>One type of D3 selection or mouse event I would like to use:</strong>
                 <code>d3.selectAll("#horizons").selectAll("path")...</code> will be called when the slider updated.
                 <code>d3.select("#mySlider").on("input", function() { var sliderValue = d3.select(this).property("value");...}</code>
-                can be used to recognize slider changes.</li>
+                can be used to recognize slider changes.
+            </li>
         </ul>
 
 
         <h2>Problem 4</h2>
-        <h4>a.</h4>
-        <iframe src="https://kcui23.github.io/stat679/ps3/4.html" width="900" height="1500"></iframe>
+        <h4>a & b.</h4>
+        <div><a href="#collapseCode4html" class="btn btn-primary" data-toggle="collapse">Show/Hide HTML code</a></div>
+        <div id="collapseCode4html" class="collapse">
+            <pre><code class="language-markup">&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>
+    &lt;script src="https://d3js.org/d3.v7.min.js">&lt;/script>
+    &lt;script src="https://d3js.org/d3-selection-multi.v1.min.js">&lt;/script>
+&lt;/head>
+&lt;body>
+    &lt;svg height=500 width=900>
+    &lt;g id="series" /&gt;
+    &lt;g id="axes" /&gt;
+    &lt;/svg>
+    &lt;svg id="choropleth" height=900 width=900>
+    &lt;g id="map" /&gt;
+    &lt;/svg>
+&lt;/body>
+&lt;script src="4.js">&lt;/script>
+&lt;/html></code></pre>
+        </div>
+        <br>
+        <div><a href="#collapseCode4js" class="btn btn-primary" data-toggle="collapse">Show/Hide js code</a></div>
+        <div id="collapseCode4js" class="collapse">
+            <pre><code class="language-r">function visualize_line(data) {
+    data = parse(data);
+    draw_line(data, myscale(data));
+    add_axes(myscale(data));
+}
+
+function parse(data) {
+    let parse_time = d3.timeParse("%Y %b");
+    let groupedData = data.reduce((acc, cur) => {
+        if (cur.date === 'NA' || cur.calfresh === 'NA') {
+            return acc;
+        }
+        cur.date = parse_time(cur.date);
+        if (!acc[cur.county]) {
+            acc[cur.county] = [];
+        }
+        acc[cur.county].push(cur);
+        return acc;
+    }, {});
+
+    return Object.values(groupedData);
+}
+
+function draw_line(data, myscale) {
+    line = d3.line()
+        .x(d => myscale.x(d.date))
+        .y(d => myscale.y(d.calfresh));
+    d3.select("svg")
+        .select("#series")
+        .selectAll("path")
+        .data(data).enter()
+        .append("path")
+        .attrs({
+            "fill": "none",
+            "stroke": "black",
+            "stroke-opacity": 0.3,
+            "d": line
+        });
+}
+
+function add_axes(myscale) {
+    let x_axis = d3.axisBottom()
+        .scale(myscale.x),
+        y_axis = d3.axisLeft()
+            .scale(myscale.y);
+
+    d3.select("#axes")
+        .append("g")
+        .attrs({
+            id: "x_axis",
+            transform: `translate(0,${height - margins.bottom})`
+        })
+        .call(x_axis);
+
+    d3.select("#axes")
+        .append("g")
+        .attrs({
+            id: "y_axis",
+            transform: `translate(${margins.left}, 0)`
+        })
+        .call(y_axis)
+}
+
+function myscale(data) {
+    let y_max = 840000,
+        x_extent = d3.extent(data[0].map(d => d.date));
+
+    return {
+        x: d3.scaleTime()
+            .domain(x_extent)
+            .range([margins.left, width - margins.right]),
+        y: d3.scaleLinear()
+            .domain([0, y_max])
+            .range([height - margins.bottom, margins.top])
+    }
+}
+
+function visualize_choropleth(data) {
+    data = c_parse(data);
+    console.log(data);
+    let proj = d3.geoMercator()
+        .fitSize([900, 900], data)
+    let path = d3.geoPath()
+        .projection(proj);
+
+    d3.select("#map")
+        .selectAll("path")
+        .data(data.features).enter()
+        .append("path")
+        .attrs({
+            "d": d => path(d),
+            "fill": d => d3.interpolateBlues(d.properties.calfresh_avg / 200000),
+            "stroke-width": 0.1,
+            "stroke": "black"
+        })
+
+}
+
+function c_parse(data) {
+    let geojsonData = data[0];
+    let csvData = data[1];
+
+    let calfreshAvgByCounty = {};
+    csvData.forEach(function (d) {
+        calfreshAvgByCounty[d.county] = calfreshAvgByCounty[d.county] || [];
+        if (!isNaN(d.calfresh)) {
+            calfreshAvgByCounty[d.county].push(+d.calfresh);
+        }
+    });
+
+    for (let county in calfreshAvgByCounty) {
+        calfreshAvgByCounty[county] = d3.mean(calfreshAvgByCounty[county]);
+    }
+
+    geojsonData.features.forEach(function (feature) {
+        let county = feature.properties.COUNTY_NAME;
+        feature.properties.calfresh_avg = calfreshAvgByCounty[county] || 0;
+    });
+
+    return geojsonData;
+}
+
+let width = 900,
+    height = 500,
+    margins = { top: 50, bottom: 50, left: 50, right: 50 }
+d3.csv("https://raw.githubusercontent.com/kcui23/stat679/main/ps3/calfresh-small.csv")
+    .then(visualize_line)
+Promise.all([d3.json("https://raw.githubusercontent.com/kcui23/stat679/main/ps3/California_County_Boundaries.geojson"),
+d3.csv("https://raw.githubusercontent.com/kcui23/stat679/main/ps3/calfresh-small.csv")])
+    .then(visualize_choropleth)</code></pre>
+        </div>
+        <br>
+        <iframe src="https://kcui23.github.io/stat679/ps3/4.html" width="900" height="1400"></iframe>
         <h4>c.</h4>
         <p>One possible interactivity is highlighting the time series when the a county is hovered.</p>
         <h4>d.</h4>
@@ -289,6 +565,9 @@
 
 
     </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-r.min.js"></script>
     <!-- 对于R语言高亮 -->

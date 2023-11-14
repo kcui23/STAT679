@@ -91,22 +91,18 @@ function updateLineChart(selectedCounty) {
 }
 
 function updateYAxis(myscale) {
-    if (d3.select("#y_axis")) {
-        d3.selectAll("#y_axis").remove();
-    }
-    let y_axis = d3.axisLeft()
-                .scale(myscale.y);
+    let y_axis = d3.axisLeft().scale(myscale.y),
+        yAxisElement = d3.select("#axes").selectAll("#y_axis").data([0]);
+    let yAxisEnter = yAxisElement.enter().append("g").attr("id", "y_axis");
+    yAxisElement = yAxisEnter.merge(yAxisElement);
 
-    d3.select("#axes")
-      .append("g")
-        .transition()
+    yAxisElement.transition()
         .duration(500)
-        .attrs({
-            id: "y_axis",
-            transform: `translate(${margins.left}, 0)`
-        })
-        .call(y_axis);
+        .ease(d3.easeExp)
+        .call(y_axis)
+        .attr("transform", `translate(${margins.left}, 0)`);
 }
+
 
 function visualize_choropleth(data) {
     originalData = parse(data[1]);

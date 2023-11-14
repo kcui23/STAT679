@@ -252,6 +252,8 @@ ggplot(pbs) +
 
         <h2>Problem 3</h2>
         <h4>a & b.</h4>
+        <p><b>Design of line-based plot</b>: The x-axis represents the date, and the y-axis represents streams. We can choose to either use or not use facets to divide the chart into subplots because, in the interactive component, we can emphasize a particular line individually. Subsequently, we adjusted the axes and formatted some text to enhance the overall aesthetic appeal.</p>
+        <p><b>Design of horizon plot</b>: The logic of the horizon plot is essentially consistent with that of a lines plot, but we have employed the <code>geom_horizon()</code> function and made minor adjustments to the legend.</p>
         <div><a href="#collapseCode3ab" class="btn btn-primary" data-toggle="collapse">Show/Hide code for part (a)</a></div>
         <div id="collapseCode3ab" class="collapse">
             <pre><code class="language-r">ggplot(spotify) +
@@ -492,7 +494,7 @@ d3.csv("https://raw.githubusercontent.com/kcui23/stat679/main/ps3/calfresh-small
     .then(visualize_choropleth)</code></pre>
         </div>
         <br>
-        <iframe src="https://kcui23.github.io/stat679/ps3/4.html" width="900" height="1400"></iframe>
+        <iframe src="https://kcui23.github.io/stat679/ps3/4.html" width="900" height="1100"></iframe>
         <h4>c.</h4>
         <p>One possible interactivity is highlighting the time series when the a county is hovered.</p>
         <h4>d.</h4>

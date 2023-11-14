@@ -99,7 +99,7 @@ function visualize_choropleth(data) {
     data = c_parse(data);
     console.log(data);
     let proj = d3.geoMercator()
-        .fitSize([900, 900], data)
+        .fitSize([600, 600], data)
     let path = d3.geoPath()
         .projection(proj);
 

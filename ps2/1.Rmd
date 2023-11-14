@@ -1,0 +1,33 @@
+```{r}
+library(ggridges)
+library(tidyverse)
+theme_set(theme_minimal())
+```
+
+```{r}
+activity <- read_csv("https://github.com/krisrs1128/stat992_f23/raw/main/exercises/ps2/activity.csv")
+View(activity)
+```
+
+```{r}
+ggplot(activity, aes(x=time, y=prop_smooth)) +
+  geom_line() +
+  labs(
+    title = "prop_smooth over time for each activity",
+    y = "Proportion",
+    x = "Time of Day"
+  ) +
+  theme(axis.text.x = element_text(angle = 50, vjust = 0.5)) +
+  facet_wrap(~activity)
+```
+
+```{r}
+ggplot(activity, aes(x = time, y = activity, height = prop_smooth)) +
+  geom_ridgeline() +
+  labs(
+    title = "prop_smooth over time for each activity",
+    y = "Proportion",
+    x = "Time of Day"
+  )
+```
+

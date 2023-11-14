@@ -1,0 +1,195 @@
+```{r}
+library(sf)
+library(shiny)
+library(tidyverse)
+theme_set(theme_minimal())
+```
+
+```{r}
+power_plants <- read_sf("https://raw.githubusercontent.com/krisrs1128/stat992_f23/main/exercises/ps2/power_plants.geojson") %>%
+  mutate(
+    coords = st_coordinates(geometry),
+    longitude = coords[, 1],
+    latitude = coords[, 2]
+  )
+
+```
+
+```{r}
+ui <- fluidPage(
+            plotOutput("scatter_plot")
+            )
+
+            server <- function(input, output) {
+            output$scatter_plot <- renderPlot({
+                ggplot(power_plants, aes(longitude, latitude, color=primary_fuel, size=capacity_mw)) +
+                geom_point() +
+                labs(x="Longitude",
+                    y="Latitude",
+                    color = "Fuel Type",
+                    size = "Capacity (MW)") +
+                scale_color_brewer(palette = "Dark2")
+            })
+            }
+shinyApp(ui,server)
+```
+
+```{r}
+ggplot(power_plants, aes(longitude, latitude, color=primary_fuel, size=capacity_mw)) +
+  geom_point() +
+  labs(x="Longitude",
+       y="Latitude",
+       color = "Fuel Type",
+       size = "Capacity (MW)") +
+  scale_color_brewer(palette = "Dark2")
+```
+
+```{r}
+ggplot(power_plants, aes(log(1+capacity_mw), fill=primary_fuel)) +
+  geom_histogram(bins=35) +
+  labs(x="Log(1+Power)",
+       y="Count",
+       fill="Fuel") +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+```{r}
+reset_selection <- function(x, brush) {
+  brushedPoints(x, brush, allRows = TRUE)$selected_
+}
+
+histogram <- function(x, selected_) {
+  my_alpha <- c("TRUE" = 1, "FALSE" = 0.3)
+  x %>%
+    mutate(selected_ = selected_) %>%
+    ggplot(aes(x = log_capacity, fill = primary_fuel, alpha = as.factor(selected_))) +
+    geom_histogram(position = "stack", bins = 35) +
+    scale_alpha_manual(values = my_alpha) +
+    guides(alpha = FALSE) +
+    labs(x = "Log(1 + Power)",
+         y = "Count",
+         fill = "Fuel") +
+    scale_fill_brewer(palette = "Dark2")
+}
+
+scatter <- function(x, selected_) {
+  x %>%
+    filter(selected_) %>%
+    ggplot(aes(longitude, latitude, color=primary_fuel, size=capacity_mw)) +
+    geom_point() +
+    labs(x="Longitude",
+         y="Latitude",
+         color = "Fuel Type",
+         size = "Capacity (MW)") +
+    scale_color_brewer(palette = "Dark2")
+}
+
+data_table <- function(x, selected_) {
+  x %>%
+    filter(selected_) %>%
+    st_drop_geometry() %>% 
+    select(name, owner, primary_fuel, commissioning_year, capacity_mw) %>% 
+    rename(
+        Plant = name,
+        Owner = owner,
+        Fuel = primary_fuel,
+        `Year Built` = commissioning_year,
+        `Capacity (MW)` = capacity_mw
+    )
+}
+
+ui <- fluidPage(
+  fluidRow(
+    column(6, plotOutput("hist", brush = brushOpts("plot_brush", direction = "x"))),
+    column(6, plotOutput("scatter_plot"))
+  ),
+  dataTableOutput("table")
+)
+
+server <- function(input, output) {
+  selected <- reactiveVal(rep(TRUE, nrow(power_plants))) 
+  
+  observeEvent(
+    input$plot_brush,
+    {selected(reset_selection(power_plants, input$plot_brush))}
+  )
+  
+  output$hist <- renderPlot(histogram(power_plants, selected()))
+  output$scatter_plot <- renderPlot(scatter(power_plants, selected()))
+  output$table <- renderDataTable(data_table(power_plants, selected()))
+}
+
+app <- shinyApp(ui, server)
+app
+```
+
+```{r}
+reset_selection <- function(x, brush) {
+  brushedPoints(x, brush, allRows = TRUE)$selected_
+}
+
+histogram <- function(x, selected_) {
+  # my_alpha <- c("TRUE" = 1, "FALSE" = 0.3)
+  x %>%
+    mutate(selected_ = selected_) %>%
+    ggplot(aes(x = log_capacity, fill = primary_fuel, alpha = as.numeric(selected_))) +
+    geom_histogram(position = "stack", bins = 35) +
+    #scale_alpha(range=c(0.1,1)) +
+    # guides(alpha = FALSE) +
+    labs(x = "Log(1 + Power)",
+         y = "Count",
+         fill = "Fuel") +
+    scale_fill_brewer(palette = "Dark2")
+}
+
+scatter <- function(x, selected_) {
+  x %>%
+    filter(selected_) %>%
+    ggplot(aes(longitude, latitude, color=primary_fuel, size=capacity_mw)) +
+    geom_point() +
+    labs(x="Longitude",
+         y="Latitude",
+         color = "Fuel Type",
+         size = "Capacity (MW)") +
+    scale_color_brewer(palette = "Dark2")
+}
+
+data_table <- function(x, selected_) {
+  x %>%
+    filter(selected_) %>%
+    st_drop_geometry() %>% 
+    select(name, owner, primary_fuel, commissioning_year, capacity_mw) %>% 
+    rename(
+        Plant = name,
+        Owner = owner,
+        Fuel = primary_fuel,
+        `Year Built` = commissioning_year,
+        `Capacity (MW)` = capacity_mw
+    )
+}
+
+ui <- fluidPage(
+  fluidRow(
+    column(6, plotOutput("hist", brush = brushOpts("plot_brush", direction = "x"))),
+    column(6, plotOutput("scatter_plot"))
+  ),
+  dataTableOutput("table")
+)
+
+server <- function(input, output) {
+  selected <- reactiveVal(rep(TRUE, nrow(power_plants))) 
+  
+  observeEvent(
+    input$plot_brush,
+    {selected(reset_selection(power_plants, input$plot_brush))}
+  )
+  
+  output$hist <- renderPlot(histogram(power_plants, selected()))
+  output$scatter_plot <- renderPlot(scatter(power_plants, selected()))
+  output$table <- renderDataTable(data_table(power_plants, selected()))
+}
+
+app <- shinyApp(ui, server)
+app
+```
+

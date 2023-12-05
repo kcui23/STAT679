@@ -47,7 +47,8 @@ high values: breads, snacks
 sorted_groups <- scores %>%
   group_by(group) %>%
   summarize(average_PC2 = mean(PC2, na.rm = TRUE)) %>%
-  arrange(average_PC2)
+  arrange(average_PC2) %>% 
+  pull(group)
 sorted_groups
 ```
 

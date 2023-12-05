@@ -49,7 +49,7 @@ sorted_groups <- scores %>%
   summarize(average_PC2 = mean(PC2, na.rm = TRUE)) %>%
   arrange(average_PC2) %>% 
   pull(group)
-sorted_groups
+paste(sorted_groups)
 ```
 
 (d)

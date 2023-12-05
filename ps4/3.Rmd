@@ -1,0 +1,60 @@
+(a)
+```{r}
+library(tidyverse)
+library(tidymodels)
+
+nutrients <- read_csv("https://uwmadison.box.com/shared/static/nmgouzobq5367aex45pnbzgkhm7sur63.csv")
+pca_rec <- recipe(~., data = nutrients) %>%
+  update_role(id, name, group, group_lumped, new_role = "id") %>%
+  step_normalize(all_predictors()) %>%
+  step_pca(all_predictors())
+pca_prep <- prep(pca_rec)
+
+tidy(pca_prep, 1)
+```
+
+
+(b)
+```{r}
+scores <- juice(pca_prep)
+components <- tidy(pca_prep, 2) %>% 
+  filter(component %in% str_c("PC", 1:6))
+variances <- tidy(pca_prep, 2, type = "variance") %>% 
+  filter(terms == "percent variance")
+
+ggplot(variances) +
+  geom_col(aes(component, value))
+```
+
+```{r}
+
+ggplot(components, aes(value ,terms)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~component, nrow = 1) +
+  labs(y = NULL) +
+  theme(axis.text = element_text(size = 7)) +
+  theme_bw()
+```
+PC1:
+low values: fats, nuts
+high values: vegetables, drinks
+PC2:
+low values: meats
+high values: breads, snacks
+
+(c)
+```{r}
+sorted_groups <- scores %>%
+  group_by(group) %>%
+  summarize(average_PC2 = mean(PC2, na.rm = TRUE)) %>%
+  arrange(average_PC2)
+sorted_groups
+```
+
+(d)
+```{r}
+ggplot(scores, aes(PC1, PC2, label = name)) +
+  geom_point(alpha = 0.7, size = 1.5) +
+  facet_wrap(~reorder(group, PC2, funs = mean))
+```
+My guess about the food types on PC1 was basically accurate, but PC2 was a bit unexpected. The low values of PC2 seem to be mainly Fats and Oils, and the high values are mainly Spices and Herbs.

@@ -1,0 +1,35 @@
+(a)
+```{r}
+library(tidygraph)
+library(ggraph)
+library(readr)
+theme_set(theme_bw())
+
+edge_data_path <- "https://raw.githubusercontent.com/krisrs1128/stat992_f23/6c4130bddbdfc9ef90537c794cdca47773643752/activities/week10/political-books-edges.csv"
+node_data_path <- "https://raw.githubusercontent.com/krisrs1128/stat992_f23/6c4130bddbdfc9ef90537c794cdca47773643752/activities/week10/political-books-nodes.csv"
+edges <- read_csv(edge_data_path, col_types = "cci")
+nodes <- read_csv(node_data_path, col_types = "ccc")
+
+G <- tbl_graph(nodes = nodes, edges = edges)
+```
+
+(b)
+```{r}
+ggraph(G, layout = "nicely") +
+  geom_edge_link(width = 0.2) +
+  geom_node_point(aes(color = political_ideology), size = 5) +
+  geom_node_text(aes(label = label), size = 2.5)
+```
+
+(c)
+```{r}
+ggraph(G, layout = "matrix") +
+  geom_edge_tile() +
+  coord_fixed(xlim = c(-1, NA), ylim = c(-1, NA)) +
+  geom_node_text(aes(label = label), size = 1, x = -1, nudge_y = 0.5) +
+  geom_node_text(aes(label = label), y = -1, size = 1, nudge_x = -0.5, angle = 90)
+```
+ What is easy to see in the node-link view: Which books (more than two) are often recommended together?
+ What is easy to see in the adjacency matrix: Among the books recommended together with Empire, which ones are recommended together with Betrayal?
+
+

@@ -1,0 +1,64 @@
+(a)
+```{r}
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+
+paragraphs <- read_csv("https://uwmadison.box.com/shared/static/pz1lz301ufhbedzsj9iioee77r95xz4v.csv")
+word_counts <- paragraphs %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(paragraph, word)
+chapters_dtm <- word_counts %>%
+  cast_dtm(paragraph, word, n)
+chapters_dtm
+```
+
+(b)
+```{r}
+chapters_lda <- LDA(chapters_dtm, k = 6, control = list(seed = 479))
+chapters_lda
+```
+
+(c)
+```{r}
+library(superheat)
+library(ggrepel)
+
+topics <- tidy(chapters_lda, matrix = "beta")
+memberships <- tidy(chapters_lda, matrix = "gamma")
+topics %>%
+  arrange(topic, -beta)
+memberships %>%
+  arrange(document, topic)
+
+top_terms <- topics %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>%
+  mutate(term = reorder_within(term, beta, topic))
+
+ggplot(top_terms, aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_fill_brewer(palette = "Set2") +
+  scale_y_reordered()
+```
+
+(d)
+```{r}
+memberships <- tidy(chapters_lda, matrix = "gamma")
+
+purest_paragraph_index <- memberships %>%
+  filter(topic == 2) %>%
+  arrange(desc(gamma)) %>%
+  top_n(1, gamma) %>%
+  pull(document)
+
+purest_paragraph <- paragraphs$text[as.numeric(purest_paragraph_index)]
+first_sentence <- unlist(strsplit(purest_paragraph, '\\. '))[1]
+paste(first_sentence)
+
+# Verify
+word_counts[word_counts$paragraph==purest_paragraph_index,"word"][,1]
+```
+

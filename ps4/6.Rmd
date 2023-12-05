@@ -1,0 +1,17 @@
+(a)
+For panning: 
+projection.forEach(d => {
+    const s = sprites.get(d.id)
+    const f = fisheye([d.x, d.y])
+    s.position.x = f[0]
+    s.position.y = f[1]
+    s.scale.set(scale * f[2])
+  })
+in the project = f(p)
+
+For zooming:
+.scaleExtent([1, 50])
+.translateExtent([[0,0],[width,height]])
+in the zoom = f(t)  
+
+(b)

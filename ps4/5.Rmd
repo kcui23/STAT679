@@ -1,0 +1,4 @@
+(a)
+The root object is derived from d3.hierarchy(data). It was sorted based on node height and name. The bilink function modifies this hierarchy for edge bundling. After that, d3.cluster() arranges this hierarchy in a circular layout, setting positions for each node. In root, each node contains information of its data, depth in the hierarchy, parent and children nodes, and coordinates (x and y) assigned by the cluster layout.
+
+(b)
